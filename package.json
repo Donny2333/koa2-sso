@@ -4,7 +4,11 @@
   "description": "koa cas middleware",
   "main": "index.js",
   "scripts": {
+    "start": "node example/app",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "git": "https://github.com/Donny2333/koa2-sso.git"
   },
   "keywords": [
     "koa",
@@ -14,7 +18,13 @@
   "author": "Donny",
   "license": "ISC",
   "dependencies": {
+    "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
     "koa": "^2.5.1",
+    "koa-bodyparser": "^4.2.0",
+    "koa-json": "^2.0.2",
+    "koa-router": "^7.4.0",
     "koa-session": "^5.8.1"
   }
 }
