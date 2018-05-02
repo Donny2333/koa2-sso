@@ -54,6 +54,7 @@ const cas = new Cas({
 
 ```javascript
 const Koa = require('koa')
+const Router = require('koa-router')
 const Session = require('koa-session')
 const Cas = require('koa2-cas')
 
@@ -67,31 +68,41 @@ var cas = new Cas({
   service_url: 'https://my-service-host.com'
 })
 
+const router = Router()
+
 // Unauthenticated clients will be redirected to the CAS login and then back to
 // this route once authenticated.
-app.get('/app', cas.bounce, ctx => {
-  res.send('<html><body>Hello!</body></html>')
+router.get('/app', cas.bounce, ctx => {
+  ctx.body = '<html><body>Hello!</body></html>'
+})
+
+router.get('/hello', ctx => {
+  ctx.body = '<html><body>Hello!</body></html>'
 })
 
 // Unauthenticated clients will receive a 401 Unauthorized response instead of
 // the JSON data.
-app.get('/api', cas.block, ctx => {
-  res.json({ success: true })
+router.get('/api', cas.block, ctx => {
+  ctx.body = { success: true }
 })
 
 // An example of accessing the CAS user session variable. This could be used to
 // retrieve your own local user records based on authenticated CAS username.
-app.get('/api/user', cas.block, ctx => {
-  res.json({ cas_user: req.session[cas.session_name] })
+router.get('/api/user', cas.block, ctx => {
+  ctx.body = {
+    cas_user: ctx.session[cas.session_name]
+  }
 })
 
 // Unauthenticated clients will be redirected to the CAS login and then to the
 // provided "redirectTo" query parameter once authenticated.
-app.get('/authenticate', cas.bounce_redirect)
+router.get('/authenticate', cas.bounce_redirect)
 
 // This route will de-authenticate the client with the Koa server and then
 // redirect the client to the CAS logout page.
-app.get('/logout', cas.logout)
+router.get('/logout', cas.logout)
+
+app.use(router.routes())
 
 app.listen(3000, _ => {
   console.log('listening on port 3000')

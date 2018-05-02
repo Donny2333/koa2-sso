@@ -11,22 +11,7 @@ app.use(koaBodyparser())
 
 // Set up an Koa session, which is required for CASAuthentication.
 app.keys = ['some secret hurr']
-app.use(
-  Session(
-    {
-      key: 'super secret key' /** (string) cookie key (default is koa:sess) */,
-      /** (number || 'session') maxAge in ms (default is 1 days) */
-      /** 'session' will result in a cookie that expires when session/browser is closed */
-      /** Warning: If a session cookie is stolen, this cookie will never expire */
-      maxAge: 86400000,
-      overwrite: true /** (boolean) can overwrite or not (default true) */,
-      httpOnly: true /** (boolean) httpOnly or not (default true) */,
-      signed: true /** (boolean) signed or not (default true) */,
-      rolling: false /** (boolean) Force a session identifier cookie to be set on every response. The expiration is reset to the original maxAge, resetting the expiration countdown. default is false **/
-    },
-    app
-  )
-)
+app.use(Session(app))
 
 // Create a new instance of CASAuthentication.
 const cas = new Cas({
@@ -54,11 +39,6 @@ router.get('/hello', ctx => {
   ctx.body = '<html><body>Hello!</body></html>'
 })
 
-router.get('/baidu', ctx => {
-  //   ctx.body = '<html><body>Hello!</body></html>'
-  ctx.redirect('/app')
-})
-
 // Unauthenticated clients will receive a 401 Unauthorized response instead of
 // the JSON data.
 router.get('/api', cas.block, ctx => {
@@ -80,16 +60,6 @@ router.get('/authenticate', cas.bounce_redirect)
 // This route will de-authenticate the client with the Koa server and then
 // redirect the client to the CAS logout page.
 router.get('/logout', cas.logout)
-
-router.get('/', ctx => {
-  // ignore favicon
-  if (ctx.path === '/favicon.ico') return
-
-  let n = ctx.session.views || 0
-  ctx.session.views = ++n
-  console.log(ctx.session)
-  ctx.body = n + ' views'
-})
 
 app.use(json())
 app.use(router.routes())

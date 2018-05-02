@@ -55,7 +55,6 @@ module.exports = class Cas {
       _validateUri = '/validate'
       _validate = function (body, callback) {
         var lines = body.split('\n')
-        console.log(lines)
         if (lines[0] === 'yes' && lines.length >= 2) {
           return callback(null, lines[1])
         } else if (lines[0] === 'no') {
@@ -202,9 +201,9 @@ module.exports = class Cas {
    * already validated with CAS, their request will be redirected to the CAS
    * login page.
    */
-  bounce(ctx, next) {
+  async bounce(ctx, next) {
     // Handle the request with the bounce authorization type.
-    _handle.bind(this)(ctx, next, AUTH_TYPE.BOUNCE)
+    await _handle.bind(this)(ctx, next, AUTH_TYPE.BOUNCE)
   }
 
   /**
@@ -212,18 +211,18 @@ module.exports = class Cas {
    * already validated with CAS, their request will be redirected to the CAS
    * login page.
    */
-  bounce_redirect(ctx, next) {
+  async bounce_redirect(ctx, next) {
     // Handle the request with the bounce authorization type.
-    _handle.bind(this)(ctx, next, AUTH_TYPE.BOUNCE_REDIRECT)
+    await _handle.bind(this)(ctx, next, AUTH_TYPE.BOUNCE_REDIRECT)
   }
 
   /**
    * Blocks a request with CAS authentication. If the user's session is not
    * already validated with CAS, they will receive a 401 response.
    */
-  block(ctx, next) {
+  async block(ctx, next) {
     // Handle the request with the block authorization type.
-    _handle.bind(this)(ctx, next, AUTH_TYPE.BLOCK)
+    await _handle.bind(this)(ctx, next, AUTH_TYPE.BLOCK)
   }
 
   /**
@@ -254,8 +253,7 @@ module.exports = class Cas {
 /**
  * Handle a request with CAS authentication.
  */
-function _handle(ctx, next, authType) {
-  console.log(ctx.session)
+async function _handle(ctx, next, authType) {
   // If the session has been validated with CAS, no action is required.
   if (ctx.session[this.session_name]) {
     // If this is a bounce redirect, redirect the authenticated user.
@@ -279,12 +277,10 @@ function _handle(ctx, next, authType) {
   }
   // If there is a CAS ticket in the query string, validate it with the CAS server.
   else if (ctx.query && ctx.query.ticket) {
-    console.log('handleTicket')
-    _handleTicket.bind(this)(ctx, next)
+    await _handleTicket.bind(this)(ctx, next)
   }
   // Otherwise, redirect the user to the CAS login.
   else {
-    console.log('login')
     _login.bind(this)(ctx, next)
   }
 }
@@ -389,8 +385,6 @@ async function _handleTicket(ctx, next) {
     }
   }
 
-  console.log(requestOptions)
-
   try {
     const body = await _request.bind(this)(requestOptions)
 
@@ -404,7 +398,6 @@ async function _handleTicket(ctx, next) {
           ctx.session[this.session_info] = attributes || {}
         }
         ctx.redirect(ctx.session.cas_return_to)
-        console.log(ctx.session)
       }
     })
   } catch (err) {
