@@ -107,9 +107,7 @@ module.exports = class Cas {
     } else if (this.cas_version === 'saml1.1') {
       _validateUri = '/samlValidate'
       _validate = function (body, callback) {
-        parseXML(
-          body,
-          {
+        parseXML(body, {
             trim: true,
             normalize: true,
             explicitArray: false,
@@ -117,8 +115,7 @@ module.exports = class Cas {
               XMLprocessors.normalize,
               XMLprocessors.stripPrefix
             ]
-          },
-          function (err, result) {
+          }, (err, result) => {
             if (err) {
               return callback(new Error('Response from CAS server was bad.'))
             }
@@ -164,9 +161,7 @@ module.exports = class Cas {
       }
     } else {
       throw new Error(
-        'The supplied CAS version ("' +
-        this.cas_version +
-        '") is not supported.'
+        'The supplied CAS version ("' + this.cas_version + '") is not supported.'
       )
     }
 
