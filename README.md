@@ -4,35 +4,35 @@ This is a CAS authentication library designed to be used with an Koa server.
 
 It provides two middleware functions for controlling access to routes:
 
-- `bounce`: Redirects an unauthenticated client to the CAS login page and then back to the requested page.
-- `block`: Completely denies access to an unauthenticated client and returns a 401 response.
+* `bounce`: Redirects an unauthenticated client to the CAS login page and then back to the requested page.
+* `block`: Completely denies access to an unauthenticated client and returns a 401 response.
 
 It also provides two route endpoint functions:
 
-- `bounce_redirect`: Acts just like `bounce` but once the client is authenticated they will be redirected to the provided _returnTo_ query parameter.
-- `logout`: De-authenticates the client with the Koa server and then redirects them to the CAS logout page.
+* `bounce_redirect`: Acts just like `bounce` but once the client is authenticated they will be redirected to the provided _returnTo_ query parameter.
+* `logout`: De-authenticates the client with the Koa server and then redirects them to the CAS logout page.
 
 ## Installation
 
-    npm install cas-authentication
+    npm install koa2-cas
 
 ## Setup
 
 ```javascript
-var CASAuthentication = require('cas-authentication');
+import Cas from 'koa2-cas'
 
-var cas = new CASAuthentication({
-    cas_url         : 'https://my-cas-host.com/cas',
-    service_url     : 'https://my-service-host.com',
-    cas_version     : '3.0',
-    renew           : false,
-    is_dev_mode     : false,
-    dev_mode_user   : '',
-    dev_mode_info   : {},
-    session_name    : 'cas_user',
-    session_info    : 'cas_userinfo',
-    destroy_session : false
-});
+const cas = new Cas({
+  cas_url: 'https://my-cas-host.com/cas',
+  service_url: 'https://my-service-host.com',
+  cas_version: '3.0',
+  renew: false,
+  is_dev_mode: false,
+  dev_mode_user: '',
+  dev_mode_info: {},
+  session_name: 'cas_user',
+  session_info: 'cas_userinfo',
+  destroy_session: false
+})
 ```
 
 ### Options
@@ -53,46 +53,55 @@ var cas = new CASAuthentication({
 ## Usage
 
 ```javascript
-import koa from 'koa';
-import session from 'koa-session';
-import Cas from 'koa-cas';
+const Koa = require('koa')
+const Router = require('koa-router')
+const Session = require('koa-session')
+const Cas = require('koa2-cas')
 
 // Set up an Koa session, which is required for CASAuthentication.
-app.use( session({
-    secret            : 'super secret key',
-    resave            : false,
-    saveUninitialized : true
-}));
+app.keys = ['some secret hurr']
+app.use(Session(app))
 
 // Create a new instance of CASAuthentication.
 var cas = new Cas({
-    cas_url     : 'https://my-cas-host.com/cas',
-    service_url : 'https://my-service-host.com'
-});
+  cas_url: 'https://my-cas-host.com/cas',
+  service_url: 'https://my-service-host.com'
+})
+
+const router = Router()
 
 // Unauthenticated clients will be redirected to the CAS login and then back to
 // this route once authenticated.
-app.get( '/app', cas.bounce, function ( req, res ) {
-    res.send( '<html><body>Hello!</body></html>' );
-});
+router.get('/app', cas.bounce, ctx => {
+  ctx.body = '<html><body>Hello!</body></html>'
+})
 
 // Unauthenticated clients will receive a 401 Unauthorized response instead of
 // the JSON data.
-app.get( '/api', cas.block, function ( req, res ) {
-    res.json( { success: true } );
-});
+router.get('/api', cas.block, ctx => {
+  ctx.body = { success: true }
+})
 
 // An example of accessing the CAS user session variable. This could be used to
 // retrieve your own local user records based on authenticated CAS username.
-app.get( '/api/user', cas.block, function ( req, res ) {
-    res.json( { cas_user: req.session[ cas.session_name ] } );
-});
+router.get('/api/user', cas.block, ctx => {
+  ctx.body = {
+    cas_user: ctx.session[cas.session_name]
+  }
+})
 
 // Unauthenticated clients will be redirected to the CAS login and then to the
 // provided "redirectTo" query parameter once authenticated.
-app.get( '/authenticate', cas.bounce_redirect );
+router.get('/authenticate', cas.bounce_redirect)
 
 // This route will de-authenticate the client with the Koa server and then
 // redirect the client to the CAS logout page.
-app.get( '/logout', cas.logout );
+router.get('/logout', cas.logout)
+
+app.use(router.routes())
+
+app.listen(3000, _ => {
+  console.log('listening on port 3000')
+})
+```
 ```
