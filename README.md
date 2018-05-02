@@ -76,10 +76,6 @@ router.get('/app', cas.bounce, ctx => {
   ctx.body = '<html><body>Hello!</body></html>'
 })
 
-router.get('/hello', ctx => {
-  ctx.body = '<html><body>Hello!</body></html>'
-})
-
 // Unauthenticated clients will receive a 401 Unauthorized response instead of
 // the JSON data.
 router.get('/api', cas.block, ctx => {
