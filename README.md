@@ -63,7 +63,7 @@ app.keys = ['some secret hurr']
 app.use(Session(app))
 
 // Create a new instance of CASAuthentication.
-var cas = new Cas({
+const cas = new Cas({
   cas_url: 'https://my-cas-host.com/cas',
   service_url: 'https://my-service-host.com'
 })
@@ -103,5 +103,4 @@ app.use(router.routes())
 app.listen(3000, _ => {
   console.log('listening on port 3000')
 })
-```
 ```

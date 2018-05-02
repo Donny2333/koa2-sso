@@ -48,8 +48,7 @@ module.exports = class Cas {
       throw new Error('CAS Authentication requires a service_url parameter.')
     }
 
-    this.cas_version =
-      options.cas_version !== undefined ? options.cas_version : '3.0'
+    this.cas_version = options.cas_version !== undefined ? options.cas_version : '3.0'
 
     if (this.cas_version === '1.0') {
       _validateUri = '/validate'
@@ -128,8 +127,7 @@ module.exports = class Cas {
                 )
               } else {
                 var attributes = {}
-                var attributesArray =
-                  samlResponse.assertion.attributestatement.attribute
+                var attributesArray = samlResponse.assertion.attributestatement.attribute
                 if (!(attributesArray instanceof Array)) {
                   attributesArray = [attributesArray]
                 }
@@ -147,8 +145,7 @@ module.exports = class Cas {
                 })
                 return callback(
                   null,
-                  samlResponse.assertion.authenticationstatement.subject
-                    .nameidentifier,
+                  samlResponse.assertion.authenticationstatement.subject.nameidentifier,
                   attributes
                 )
               }

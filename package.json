@@ -1,6 +1,6 @@
 {
   "name": "koa2-cas",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "koa cas middleware",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
-    "git": "https://github.com/Donny2333/koa2-sso.git"
+    "type": "git",
+    "url": "https://github.com/Donny2333/koa2-sso.git"
   },
   "keywords": [
     "koa",
