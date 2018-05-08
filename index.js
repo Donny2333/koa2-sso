@@ -254,14 +254,14 @@ async function _handle(ctx, next, authType) {
     }
     // Otherwise, allow them through to their request.
     else {
-      next()
+      await next()
     }
   }
   // If dev mode is active, set the CAS user to the specified dev user.
   else if (this.is_dev_mode) {
     ctx.session[this.session_name] = this.dev_mode_user
     ctx.session[this.session_info] = this.dev_mode_info
-    next()
+    await next()
   }
   // If the authentication type is BLOCK, simply send a 401 response.
   else if (authType === AUTH_TYPE.BLOCK) {

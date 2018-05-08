@@ -20,7 +20,7 @@ const cas = new Cas({
   cas_version: '1.0'
 })
 
-app.use(async function(ctx, next) {
+app.use(async (ctx, next) => {
   let start = new Date()
   await next()
   let ms = new Date() - start
@@ -35,14 +35,12 @@ router.get('/app', cas.bounce, ctx => {
   ctx.body = '<html><body>Hello!</body></html>'
 })
 
-router.get('/hello', ctx => {
-  ctx.body = '<html><body>Hello!</body></html>'
-})
-
 // Unauthenticated clients will receive a 401 Unauthorized response instead of
 // the JSON data.
 router.get('/api', cas.block, ctx => {
-  ctx.body = { success: true }
+  ctx.body = {
+    success: true
+  }
 })
 
 // An example of accessing the CAS user session variable. This could be used to
