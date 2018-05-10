@@ -250,7 +250,7 @@ async function _handle(ctx, next, authType) {
   if (ctx.session[this.session_name]) {
     // If this is a bounce redirect, redirect the authenticated user.
     if (authType === AUTH_TYPE.BOUNCE_REDIRECT) {
-      ctx.redirect(ctx.session.cas_return_to)
+      ctx.redirect(ctx.query.redirectTo)
     }
     // Otherwise, allow them through to their request.
     else {
