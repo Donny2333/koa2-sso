@@ -192,6 +192,17 @@ module.exports = class Cas {
   }
 
   /**
+   * Get the application's service url. It may depend on the current HTTP
+   * request if the service_url argument is a function.
+   * @private
+   */
+  _get_service_url(ctx) {
+    return typeof this.service_url === 'function'
+      ? this.service_url(ctx)
+      : this.service_url
+  }
+
+  /**
    * Bounces a request with CAS authentication. If the user's session is not
    * already validated with CAS, their request will be redirected to the CAS
    * login page.
@@ -290,7 +301,7 @@ function _login(ctx, next) {
 
   // Set up the query parameters.
   var query = {
-    service: this.service_url + url.parse(ctx.url).pathname,
+    service: this._get_service_url(ctx) + url.parse(ctx.url).pathname,
     renew: this.renew
   }
 
@@ -346,7 +357,7 @@ async function _handleTicket(ctx, next) {
     requestOptions.path = url.format({
       pathname: this.cas_path + _validateUri,
       query: {
-        service: this.service_url + url.parse(ctx.url).pathname,
+        service: this._get_service_url(ctx) + url.parse(ctx.url).pathname,
         ticket: ctx.query.ticket
       }
     })
@@ -370,7 +381,7 @@ async function _handleTicket(ctx, next) {
     requestOptions.path = url.format({
       pathname: this.cas_path + _validateUri,
       query: {
-        TARGET: this.service_url + url.parse(ctx.url).pathname,
+        TARGET: this._get_service_url(ctx) + url.parse(ctx.url).pathname,
         ticket: ''
       }
     })
