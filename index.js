@@ -288,7 +288,10 @@ function _login(ctx, next) {
   // Set up the query parameters.
   var query = {
     service: this.service_url + url.parse(ctx.url).pathname,
-    renew: this.renew
+  }
+  
+  if( !!this.renew ){
+    query['renew'] = this.renew
   }
 
   // Redirect to the CAS login.
